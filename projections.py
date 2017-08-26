@@ -7,33 +7,37 @@ import math
 
 
 
-def getScore(year, data):
+def getScore(year, data, pname):
     sc = 0
-    for s in data:
+    for score_find in data:
     #Find the total score
-        if (s["Year"] == year):
-            sc += s["Score"]
+        if (score_find["Year"] == year):
+            if (score_find["Player"] == pname):
+                sc += score_find["Score"]
     return sc
         
-def getSeason(year, array, score, data):
-    fg = fga = threep = threepa = twop = twopa = ft = fta = orb = drb = ast = stl = blk = tov = pf = pts = 0
+def getSeason(year, array, score, data, pname):
+    fg = threep = twop = ft = orb = drb = ast = stl = blk = tov = pf = pts = 0
+    fga = twopa = threepa = fta = 1
     for dpoints in data:
         if (dpoints["Year"] == year):
-            fg += dpoints["FG"]*(dpoints["Score"]/score)
-            fga += dpoints["FGA"]*(dpoints["Score"]/score)
-            threep += dpoints["3P"]*(dpoints["Score"]/score)
-            threepa += dpoints["3PA"]*(dpoints["Score"]/score)
-            twop += dpoints["2P"]*(dpoints["Score"]/score)
-            twopa += dpoints["2PA"]*(dpoints["Score"]/score)
-            ft += dpoints["FT"]*(dpoints["Score"]/score)
-            fta += dpoints["FTA"]*(dpoints["Score"]/score)
-            orb += dpoints["ORB"]*(dpoints["Score"]/score)
-            drb += dpoints["DRB"]*(dpoints["Score"]/score)
-            ast += dpoints["AST"]*(dpoints["Score"]/score)
-            stl += dpoints["STL"]*(dpoints["Score"]/score)
-            blk += dpoints["BLK"]*(dpoints["Score"]/score)
-            tov += dpoints["TOV"]*(dpoints["Score"]/score)
-            pf += dpoints["PF"]*(dpoints["Score"]/score)
+            if (dpoints["Player"] == pname):
+                #print year, pname
+                fg += float(dpoints["FG"])*(dpoints["Score"]/score)
+                fga += dpoints["FGA"]*(dpoints["Score"]/score)
+                threep += dpoints["3P"]*(dpoints["Score"]/score)
+                threepa += dpoints["3PA"]*(dpoints["Score"]/score)
+                twop += dpoints["2P"]*(dpoints["Score"]/score)
+                twopa += dpoints["2PA"]*(dpoints["Score"]/score)
+                ft += dpoints["FT"]*(dpoints["Score"]/score)
+                fta += dpoints["FTA"]*(dpoints["Score"]/score)
+                orb += dpoints["ORB"]*(dpoints["Score"]/score)
+                drb += dpoints["DRB"]*(dpoints["Score"]/score)
+                ast += dpoints["AST"]*(dpoints["Score"]/score)
+                stl += dpoints["STL"]*(dpoints["Score"]/score)
+                blk += dpoints["BLK"]*(dpoints["Score"]/score)
+                tov += dpoints["TOV"]*(dpoints["Score"]/score)
+                pf += dpoints["PF"]*(dpoints["Score"]/score)
     ftpc = ft/fta        
     twopc = twop/twopa
     threepc = threep/threepa
@@ -61,17 +65,32 @@ def main():
     fields = 22
     player = np.zeros((seasons, fields))
     array = np.zeros(fields)
+    player_name = ["Dragan Bender", "Kris Dunn", "Buddy Hield", "Jamal Murray",
+                  "Marquese Chriss", "Jakob Poeltl", "Thon Maker", "Malcolm Brogdon",
+                  "Karl-Anthony Towns", "D'Angelo Russell", "Kristaps Porzingis",
+                  "Emmanuel Mudiay", "Stanley Johnson", "Justise Winslow", "Myles Turner",
+                  "Devin Booker", "Willy Hernangomez", "Nikola Jokic", "Andrew Wiggins", 
+                  "Nikola Mirotic", "Nerlens Noel", "Elfrid Payton", "Jordan Clarkson",
+                  "Marcus Smart", "Zach LaVine", "Mario Hezonja", "Jusuf Nurkic", 
+                  "Jabari Parker", "Aaron Gordon", "Julius Randle", "Gary Harris", 
+                  "Rodney Hood", "Dario Saric", "Dante Exum", "Doug McDermott", "TJ Warren",
+                  "Kelly Oubre Jr", "Trey Lyles", "Frank Kaminsky", "Norman Powell", "Juan Hernangomez",
+                  "Domantas Sabonis", "Skal Labissiere", "Jahlil Okafor", "Dejounte Murray"]
 
-    with open('JEmbiid/JEmbiid.json') as data_file:
+    with open('players.json') as data_file:
         data = json.load(data_file)
-        scoe = 0
+        score = 0
         year = 1
-        while (year <= seasons):
-            score = getScore(year, data)
-            player[year-1] = getSeason(year, array, score, data)
-            year += 1
-    printStats(player, seasons, "Joel Embiid")   
-    np.savetxt('sample.csv', player, delimiter = ",")
+        for pname in player_name:
+            while (year <= seasons):
+                score = getScore(year, data, pname)
+                player[year-1] = getSeason(year, array, score, data, pname)
+                year += 1
+            year = 1    
+            f = open('sample_pl.csv', 'ab')
+            np.savetxt(f, player, delimiter = ",")
+            #print pname
+            printStats(player, 3, pname)
     
 main()
         
